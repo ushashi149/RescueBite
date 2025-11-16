@@ -161,85 +161,6 @@
             transform: scale(1.1) rotate(15deg);
         }
 
-        .trending-section {
-            padding: 20px 25px;
-            background: white;
-            border-bottom: 2px solid #e9ecef;
-        }
-
-        .trending-header {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            margin-bottom: 15px;
-            font-size: 1.1em;
-            font-weight: 700;
-            color: var(--text-dark);
-        }
-
-        .trending-deals {
-            display: flex;
-            gap: 15px;
-            overflow-x: auto;
-            padding-bottom: 10px;
-        }
-
-        .trending-deals::-webkit-scrollbar {
-            height: 6px;
-        }
-
-        .trending-deals::-webkit-scrollbar-track {
-            background: #f1f1f1;
-            border-radius: 10px;
-        }
-
-        .trending-deals::-webkit-scrollbar-thumb {
-            background: var(--light-green);
-            border-radius: 10px;
-        }
-
-        .deal-chip {
-            min-width: 200px;
-            padding: 12px 16px;
-            background: linear-gradient(135deg, #fff5e6 0%, #ffe8cc 100%);
-            border-radius: 12px;
-            border-left: 4px solid var(--accent-orange);
-            cursor: pointer;
-            transition: transform 0.2s, box-shadow 0.2s;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-        }
-
-        .deal-chip:hover {
-            transform: scale(1.05);
-            box-shadow: var(--shadow);
-        }
-
-        .deal-chip-title {
-            font-weight: 700;
-            color: var(--text-dark);
-            font-size: 0.95em;
-            margin-bottom: 4px;
-        }
-
-        .deal-chip-details {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 0.85em;
-        }
-
-        .deal-discount {
-            background: var(--accent-orange);
-            color: white;
-            padding: 2px 8px;
-            border-radius: 8px;
-            font-weight: 700;
-        }
-
-        .deal-time {
-            color: var(--text-gray);
-        }
-
         .quick-actions {
             display: flex;
             gap: 10px;
@@ -623,10 +544,6 @@
             .message-content {
                 max-width: 85%;
             }
-
-            .trending-section {
-                padding: 15px;
-            }
         }
     </style>
 </head>
@@ -643,35 +560,6 @@
                 </div>
                 <p>Save money, reduce waste, discover delicious meals near you</p>
                 <div class="location-badge">📍 Ames, IA • Delivering after-hours deals</div>
-            </div>
-        </div>
-
-        <div class="trending-section">
-            <div class="trending-header">
-                🔥 Fresh deals near you
-            </div>
-            <div class="trending-deals">
-                <div class="deal-chip" onclick="sendQuickMessage('Show me sushi deals')">
-                    <div class="deal-chip-title">$3.20 Sushi Box</div>
-                    <div class="deal-chip-details">
-                        <span class="deal-discount">80% OFF</span>
-                        <span class="deal-time">Pick up: 8-9 PM</span>
-                    </div>
-                </div>
-                <div class="deal-chip" onclick="sendQuickMessage('Show pizza deals')">
-                    <div class="deal-chip-title">$4.50 Pepperoni Pizza</div>
-                    <div class="deal-chip-details">
-                        <span class="deal-discount">70% OFF</span>
-                        <span class="deal-time">Pick up: 9-10 PM</span>
-                    </div>
-                </div>
-                <div class="deal-chip" onclick="sendQuickMessage('Breakfast options')">
-                    <div class="deal-chip-title">$2 Bagel Pack</div>
-                    <div class="deal-chip-details">
-                        <span class="deal-discount">75% OFF</span>
-                        <span class="deal-time">Closing in 30 min</span>
-                    </div>
-                </div>
             </div>
         </div>
 
