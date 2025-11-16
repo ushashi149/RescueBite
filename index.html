@@ -1,0 +1,975 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RescueBite - Rescue Food After Hours</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-green: #2d6a4f;
+            --light-green: #52b788;
+            --accent-orange: #ff6b35;
+            --accent-yellow: #ffd23f;
+            --white: #ffffff;
+            --light-bg: #f8f9fa;
+            --text-dark: #212529;
+            --text-gray: #6c757d;
+            --shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #2d6a4f 0%, #40916c 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        body.dark-mode {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+        }
+
+        body.dark-mode .container {
+            background: #0f3460;
+            color: #e8e8e8;
+        }
+
+        body.dark-mode .quick-actions,
+        body.dark-mode .chat-container,
+        body.dark-mode .input-container {
+            background: #16213e;
+            border-color: #1a1a2e;
+        }
+
+        body.dark-mode .message.bot .message-content {
+            background: #1a1a2e;
+            color: #e8e8e8;
+        }
+
+        body.dark-mode .food-card {
+            background: #1a1a2e;
+            color: #e8e8e8;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 950px;
+            background: var(--white);
+            border-radius: 24px;
+            box-shadow: var(--shadow-lg);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            height: 90vh;
+            max-height: 750px;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #52b788 0%, #2d6a4f 100%);
+            padding: 30px 25px;
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -10%;
+            width: 200px;
+            height: 200px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+        }
+
+        .header-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 12px;
+        }
+
+        .logo {
+            width: 50px;
+            height: 50px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8em;
+            backdrop-filter: blur(10px);
+        }
+
+        .header h1 {
+            font-size: 2.2em;
+            margin: 0;
+            text-shadow: 2px 2px 8px rgba(0,0,0,0.2);
+            font-weight: 700;
+        }
+
+        .header p {
+            font-size: 1em;
+            opacity: 0.95;
+            margin-top: 8px;
+        }
+
+        .location-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            margin-top: 10px;
+            backdrop-filter: blur(10px);
+        }
+
+        .dark-mode-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.2em;
+            backdrop-filter: blur(10px);
+            transition: transform 0.3s;
+            z-index: 10;
+        }
+
+        .dark-mode-toggle:hover {
+            transform: scale(1.1) rotate(15deg);
+        }
+
+        .trending-section {
+            padding: 20px 25px;
+            background: white;
+            border-bottom: 2px solid #e9ecef;
+        }
+
+        .trending-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 15px;
+            font-size: 1.1em;
+            font-weight: 700;
+            color: var(--text-dark);
+        }
+
+        .trending-deals {
+            display: flex;
+            gap: 15px;
+            overflow-x: auto;
+            padding-bottom: 10px;
+        }
+
+        .trending-deals::-webkit-scrollbar {
+            height: 6px;
+        }
+
+        .trending-deals::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+
+        .trending-deals::-webkit-scrollbar-thumb {
+            background: var(--light-green);
+            border-radius: 10px;
+        }
+
+        .deal-chip {
+            min-width: 200px;
+            padding: 12px 16px;
+            background: linear-gradient(135deg, #fff5e6 0%, #ffe8cc 100%);
+            border-radius: 12px;
+            border-left: 4px solid var(--accent-orange);
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+
+        .deal-chip:hover {
+            transform: scale(1.05);
+            box-shadow: var(--shadow);
+        }
+
+        .deal-chip-title {
+            font-weight: 700;
+            color: var(--text-dark);
+            font-size: 0.95em;
+            margin-bottom: 4px;
+        }
+
+        .deal-chip-details {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.85em;
+        }
+
+        .deal-discount {
+            background: var(--accent-orange);
+            color: white;
+            padding: 2px 8px;
+            border-radius: 8px;
+            font-weight: 700;
+        }
+
+        .deal-time {
+            color: var(--text-gray);
+        }
+
+        .quick-actions {
+            display: flex;
+            gap: 10px;
+            padding: 15px 25px;
+            background: white;
+            border-bottom: 2px solid #e9ecef;
+            overflow-x: auto;
+        }
+
+        .quick-actions::-webkit-scrollbar {
+            height: 6px;
+        }
+
+        .quick-actions::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+
+        .quick-actions::-webkit-scrollbar-thumb {
+            background: var(--light-green);
+            border-radius: 10px;
+        }
+
+        .quick-btn {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border: 2px solid transparent;
+            padding: 10px 18px;
+            border-radius: 25px;
+            cursor: pointer;
+            white-space: nowrap;
+            font-size: 0.9em;
+            font-weight: 600;
+            transition: all 0.3s;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .quick-btn:hover {
+            background: linear-gradient(135deg, var(--light-green), var(--primary-green));
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+        }
+
+        .quick-btn:active {
+            transform: translateY(0);
+        }
+
+        .chat-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 25px;
+            background: var(--light-bg);
+        }
+
+        .message {
+            margin-bottom: 20px;
+            display: flex;
+            animation: fadeIn 0.4s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .message.bot {
+            justify-content: flex-start;
+        }
+
+        .message.user {
+            justify-content: flex-end;
+        }
+
+        .message-content {
+            max-width: 70%;
+            padding: 15px 22px;
+            border-radius: 20px;
+            word-wrap: break-word;
+            box-shadow: var(--shadow);
+        }
+
+        .message.bot .message-content {
+            background: white;
+            color: var(--text-dark);
+            border-bottom-left-radius: 4px;
+        }
+
+        .message.user .message-content {
+            background: linear-gradient(135deg, var(--light-green) 0%, var(--primary-green) 100%);
+            color: white;
+            border-bottom-right-radius: 4px;
+        }
+
+        .food-card {
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            margin-top: 12px;
+            box-shadow: var(--shadow);
+            border-left: 5px solid var(--light-green);
+            transition: transform 0.3s, box-shadow 0.3s;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .food-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 80px;
+            height: 80px;
+            background: radial-gradient(circle, rgba(82, 183, 136, 0.1) 0%, transparent 70%);
+        }
+
+        .food-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .food-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 12px;
+        }
+
+        .food-card h3 {
+            color: var(--primary-green);
+            margin-bottom: 5px;
+            font-size: 1.15em;
+            font-weight: 700;
+        }
+
+        .verified-badge {
+            background: var(--light-green);
+            color: white;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.75em;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .food-name {
+            font-weight: 600;
+            color: var(--text-dark);
+            font-size: 1.05em;
+            margin-bottom: 12px;
+        }
+
+        .food-details {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin: 12px 0;
+            font-size: 0.9em;
+        }
+
+        .detail-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            color: var(--text-gray);
+        }
+
+        .detail-item strong {
+            color: var(--text-dark);
+        }
+
+        .price-section {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin: 15px 0;
+        }
+
+        .price-tag {
+            display: inline-block;
+            background: linear-gradient(135deg, var(--primary-green), var(--light-green));
+            color: white;
+            padding: 8px 18px;
+            border-radius: 25px;
+            font-weight: 800;
+            font-size: 1.3em;
+            box-shadow: 0 4px 15px rgba(45, 106, 79, 0.3);
+        }
+
+        .original-price {
+            text-decoration: line-through;
+            color: var(--text-gray);
+            font-size: 1.1em;
+        }
+
+        .discount-badge {
+            background: var(--accent-orange);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 15px;
+            font-weight: 700;
+            font-size: 0.85em;
+        }
+
+        .order-btn {
+            background: linear-gradient(135deg, var(--accent-orange), #ff8c42);
+            color: white;
+            border: none;
+            padding: 14px 28px;
+            border-radius: 30px;
+            cursor: pointer;
+            margin-top: 12px;
+            font-weight: 700;
+            font-size: 1em;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(255, 107, 53, 0.3);
+            width: 100%;
+        }
+
+        .order-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 107, 53, 0.4);
+        }
+
+        .order-btn:active {
+            transform: translateY(0);
+        }
+
+        .input-container {
+            display: flex;
+            flex-direction: column;
+            padding: 20px 25px;
+            background: white;
+            border-top: 3px solid #e9ecef;
+            gap: 12px;
+        }
+
+        .suggestion-chips {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .suggestion-chip {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .suggestion-chip:hover {
+            background: var(--light-green);
+            color: white;
+            border-color: var(--light-green);
+        }
+
+        .input-wrapper {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        #userInput {
+            flex: 1;
+            padding: 16px 24px;
+            border: 2px solid #e9ecef;
+            border-radius: 30px;
+            font-size: 1em;
+            outline: none;
+            transition: all 0.3s;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        #userInput:focus {
+            border-color: var(--light-green);
+            box-shadow: 0 4px 15px rgba(82, 183, 136, 0.2);
+        }
+
+        .voice-btn {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            border: none;
+            background: linear-gradient(135deg, #e9ecef, #dee2e6);
+            cursor: pointer;
+            font-size: 1.2em;
+            transition: all 0.3s;
+            box-shadow: var(--shadow);
+        }
+
+        .voice-btn:hover {
+            background: linear-gradient(135deg, var(--light-green), var(--primary-green));
+            color: white;
+            transform: scale(1.1);
+        }
+
+        #sendBtn {
+            padding: 14px 32px;
+            background: linear-gradient(135deg, var(--accent-orange), #ff8c42);
+            color: white;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 1em;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(255, 107, 53, 0.3);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        #sendBtn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 107, 53, 0.4);
+        }
+
+        #sendBtn:active {
+            transform: translateY(0);
+        }
+
+        .typing-indicator {
+            display: flex;
+            gap: 5px;
+            padding: 15px;
+        }
+
+        .typing-indicator span {
+            width: 10px;
+            height: 10px;
+            background: var(--light-green);
+            border-radius: 50%;
+            animation: typing 1.4s infinite;
+        }
+
+        .typing-indicator span:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .typing-indicator span:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes typing {
+            0%, 60%, 100% { transform: translateY(0); }
+            30% { transform: translateY(-12px); }
+        }
+
+        .impact-badge {
+            background: linear-gradient(135deg, #ffd23f, #ffb703);
+            color: var(--text-dark);
+            padding: 12px 20px;
+            border-radius: 16px;
+            margin-top: 10px;
+            font-weight: 700;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(255, 210, 63, 0.3);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                height: 100vh;
+                max-height: 100vh;
+                border-radius: 0;
+            }
+
+            .header h1 {
+                font-size: 1.8em;
+            }
+
+            .message-content {
+                max-width: 85%;
+            }
+
+            .trending-section {
+                padding: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <button class="dark-mode-toggle" onclick="toggleDarkMode()">🌙</button>
+            <div class="header-content">
+                <div class="logo-section">
+                    <div class="logo">🍃</div>
+                    <div>
+                        <h1>RescueBite</h1>
+                    </div>
+                </div>
+                <p>Save money, reduce waste, discover delicious meals near you</p>
+                <div class="location-badge">📍 Ames, IA • Delivering after-hours deals</div>
+            </div>
+        </div>
+
+        <div class="trending-section">
+            <div class="trending-header">
+                🔥 Fresh deals near you
+            </div>
+            <div class="trending-deals">
+                <div class="deal-chip" onclick="sendQuickMessage('Show me sushi deals')">
+                    <div class="deal-chip-title">$3.20 Sushi Box</div>
+                    <div class="deal-chip-details">
+                        <span class="deal-discount">80% OFF</span>
+                        <span class="deal-time">Pick up: 8-9 PM</span>
+                    </div>
+                </div>
+                <div class="deal-chip" onclick="sendQuickMessage('Show pizza deals')">
+                    <div class="deal-chip-title">$4.50 Pepperoni Pizza</div>
+                    <div class="deal-chip-details">
+                        <span class="deal-discount">70% OFF</span>
+                        <span class="deal-time">Pick up: 9-10 PM</span>
+                    </div>
+                </div>
+                <div class="deal-chip" onclick="sendQuickMessage('Breakfast options')">
+                    <div class="deal-chip-title">$2 Bagel Pack</div>
+                    <div class="deal-chip-details">
+                        <span class="deal-discount">75% OFF</span>
+                        <span class="deal-time">Closing in 30 min</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="quick-actions">
+            <button class="quick-btn" onclick="sendQuickMessage('What\'s available near me?')">📍 Near Me</button>
+            <button class="quick-btn" onclick="sendQuickMessage('Show pizza deals')">🍕 Pizza</button>
+            <button class="quick-btn" onclick="sendQuickMessage('Chinese food')">🥡 Chinese</button>
+            <button class="quick-btn" onclick="sendQuickMessage('Show me tacos')">🌮 Tacos</button>
+            <button class="quick-btn" onclick="sendQuickMessage('Breakfast options')">🍳 Breakfast</button>
+            <button class="quick-btn" onclick="sendQuickMessage('Indian curry')">🍛 Indian</button>
+            <button class="quick-btn" onclick="sendQuickMessage('Under $5')">💰 Under $5</button>
+            <button class="quick-btn" onclick="sendQuickMessage('Vegetarian options')">🥗 Vegetarian</button>
+        </div>
+
+        <div class="chat-container" id="chatContainer">
+            <div class="message bot">
+                <div class="message-content">
+                    🍃 Welcome to RescueBite! I help you save money, reduce food waste, and discover delicious meals near you. What are you craving right now?
+                </div>
+            </div>
+        </div>
+
+        <div class="input-container">
+            <div class="suggestion-chips">
+                <div class="suggestion-chip" onclick="sendQuickMessage('Best deals right now')">✨ Best deals right now</div>
+                <div class="suggestion-chip" onclick="sendQuickMessage('Eco-friendly options')">🌱 Eco-friendly options</div>
+                <div class="suggestion-chip" onclick="sendQuickMessage('Pick-up within 10 mins')">⚡ Pick-up within 10 mins</div>
+            </div>
+            <div class="input-wrapper">
+                <input type="text" id="userInput" placeholder="e.g., 'Pizza under $5 near campus' or 'What's closing soon?'" onkeypress="handleKeyPress(event)">
+                <button class="voice-btn" onclick="alert('🎤 Voice input coming soon!')">🎤</button>
+                <button id="sendBtn" onclick="sendMessage()">Send 🚀</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const restaurants = [
+            {
+                name: "Mario's Pizza Palace",
+                rating: 4.7,
+                items: [
+                    { food: "Large Pepperoni Pizza", original: 18, price: 6, quantity: 3, pickup: "8-9 PM", distance: "0.3 miles" },
+                    { food: "Margherita Pizza", original: 16, price: 5, quantity: 2, pickup: "8-9 PM", distance: "0.3 miles" }
+                ]
+            },
+            {
+                name: "Campus Café",
+                rating: 4.5,
+                items: [
+                    { food: "Turkey Club Sandwich", original: 12, price: 4, quantity: 5, pickup: "7-8 PM", distance: "0.5 miles" },
+                    { food: "Caesar Salad", original: 10, price: 3.5, quantity: 4, pickup: "7-8 PM", distance: "0.5 miles" }
+                ]
+            },
+            {
+                name: "Jade Garden Chinese",
+                rating: 4.8,
+                items: [
+                    { food: "Kung Pao Chicken", original: 14, price: 5, quantity: 4, pickup: "9-10 PM", distance: "0.8 miles" },
+                    { food: "Vegetable Lo Mein", original: 11, price: 4, quantity: 3, pickup: "9-10 PM", distance: "0.8 miles" }
+                ]
+            },
+            {
+                name: "The Breakfast Spot",
+                rating: 4.6,
+                items: [
+                    { food: "Breakfast Burrito", original: 9, price: 3, quantity: 6, pickup: "2-3 PM", distance: "0.4 miles" },
+                    { food: "Bagel with Cream Cheese", original: 5, price: 2, quantity: 8, pickup: "2-3 PM", distance: "0.4 miles" }
+                ]
+            },
+            {
+                name: "Curry House",
+                rating: 4.9,
+                items: [
+                    { food: "Chicken Tikka Masala", original: 15, price: 5.5, quantity: 3, pickup: "9-10 PM", distance: "1.2 miles" },
+                    { food: "Vegetable Samosas (4pc)", original: 7, price: 2.5, quantity: 10, pickup: "9-10 PM", distance: "1.2 miles" }
+                ]
+            },
+            {
+                name: "Taco Fiesta",
+                rating: 4.7,
+                items: [
+                    { food: "3 Beef Tacos", original: 10, price: 3.5, quantity: 7, pickup: "10-11 PM", distance: "0.6 miles" },
+                    { food: "Burrito Bowl", original: 12, price: 4.5, quantity: 5, pickup: "10-11 PM", distance: "0.6 miles" }
+                ]
+            }
+        ];
+
+        let conversationState = {
+            mealsSaved: 127,
+            totalSavedLbs: 0,
+            awaitingOrder: null
+        };
+
+        function toggleDarkMode() {
+            document.body.classList.toggle('dark-mode');
+            const btn = document.querySelector('.dark-mode-toggle');
+            btn.textContent = document.body.classList.contains('dark-mode') ? '☀️' : '🌙';
+        }
+
+        function addMessage(text, isBot = true, isCard = false) {
+            const chatContainer = document.getElementById('chatContainer');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${isBot ? 'bot' : 'user'}`;
+            
+            const contentDiv = document.createElement('div');
+            contentDiv.className = 'message-content';
+            
+            if (isCard) {
+                contentDiv.innerHTML = text;
+            } else {
+                contentDiv.textContent = text;
+            }
+            
+            messageDiv.appendChild(contentDiv);
+            chatContainer.appendChild(messageDiv);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+
+        function showTyping() {
+            const chatContainer = document.getElementById('chatContainer');
+            const typingDiv = document.createElement('div');
+            typingDiv.className = 'message bot';
+            typingDiv.id = 'typing';
+            typingDiv.innerHTML = '<div class="message-content"><div class="typing-indicator"><span></span><span></span><span></span></div></div>';
+            chatContainer.appendChild(typingDiv);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+
+        function removeTyping() {
+            const typing = document.getElementById('typing');
+            if (typing) typing.remove();
+        }
+
+        function createFoodCard(restaurant, item) {
+            const discount = Math.round((1 - item.price / item.original) * 100);
+            const stars = '⭐'.repeat(Math.floor(restaurant.rating));
+            return `
+                <div class="food-card">
+                    <div class="food-card-header">
+                        <div>
+                            <h3>${restaurant.name}</h3>
+                            <div style="font-size: 0.9em; color: #6c757d;">${stars} ${restaurant.rating}</div>
+                        </div>
+                        <span class="verified-badge">✓ Verified</span>
+                    </div>
+                    <div class="food-name">${item.food}</div>
+                    <div class="food-details">
+                        <div class="detail-item">📍 <strong>${item.distance}</strong></div>
+                        <div class="detail-item">⏰ <strong>${item.pickup}</strong></div>
+                        <div class="detail-item">📦 <strong>${item.quantity} left</strong></div>
+                        <div class="detail-item">✅ <strong>Food safe</strong></div>
+                    </div>
+                    <div class="price-section">
+                        <span class="price-tag">${item.price.toFixed(2)}</span>
+                        <span class="original-price">${item.original.toFixed(2)}</span>
+                        <span class="discount-badge">${discount}% OFF</span>
+                    </div>
+                    <button class="order-btn" onclick="orderFood('${restaurant.name}', '${item.food}', ${item.price})">
+                        🎉 Reserve Now
+                    </button>
+                </div>
+            `;
+        }
+
+        function orderFood(restaurant, food, price) {
+            conversationState.mealsSaved++;
+            conversationState.totalSavedLbs += 1.2;
+            
+            addMessage(`I want to order ${food} from ${restaurant}`, false);
+            
+            showTyping();
+            setTimeout(() => {
+                removeTyping();
+                const savings = Math.round((1 - price / 15) * 100);
+                addMessage(`🎉 Awesome! Your ${food} from ${restaurant} is reserved! 
+
+📱 Confirmation sent to your phone
+💳 Pay ${price.toFixed(2)} when you pick up
+📍 Address: Check your confirmation text
+⏰ Please arrive during pickup window
+
+<div class="impact-badge">✨ You saved ${conversationState.totalSavedLbs.toFixed(1)} lbs of food from waste!</div>
+
+You're saving ${savings}% and rescuing food from the landfill. Thank you for making a difference! 🌱`, true, true);
+            }, 1000);
+        }
+
+        function findRelevantFood(query) {
+            query = query.toLowerCase();
+            let results = [];
+
+            if (query.includes('pizza')) {
+                results.push({ restaurant: restaurants[0], item: restaurants[0].items[0] });
+                results.push({ restaurant: restaurants[0], item: restaurants[0].items[1] });
+            }
+            
+            if (query.includes('breakfast') || query.includes('burrito') || query.includes('bagel')) {
+                results.push({ restaurant: restaurants[3], item: restaurants[3].items[0] });
+                results.push({ restaurant: restaurants[3], item: restaurants[3].items[1] });
+            }
+
+            if (query.includes('indian') || query.includes('curry') || query.includes('tikka')) {
+                results.push({ restaurant: restaurants[4], item: restaurants[4].items[0] });
+                results.push({ restaurant: restaurants[4], item: restaurants[4].items[1] });
+            }
+
+            if (query.includes('mexican') || query.includes('taco') || query.includes('burrito bowl')) {
+                results.push({ restaurant: restaurants[5], item: restaurants[5].items[0] });
+                results.push({ restaurant: restaurants[5], item: restaurants[5].items[1] });
+            }
+            
+            if (query.includes('under $5') || query.includes('under 5') || query.includes('cheap') || query.includes('best deal')) {
+                restaurants.forEach(restaurant => {
+                    restaurant.items.forEach(item => {
+                        if (item.price <= 5) {
+                            results.push({ restaurant, item });
+                        }
+                    });
+                });
+            }
+            
+            if (query.includes('vegetarian') || query.includes('veg') || query.includes('salad') || query.includes('eco')) {
+                results.push({ restaurant: restaurants[2], item: restaurants[2].items[1] });
+                results.push({ restaurant: restaurants[1], item: restaurants[1].items[1] });
+                results.push({ restaurant: restaurants[4], item: restaurants[4].items[1] });
+            }
+
+            if (query.includes('near') || query.includes('close') || query.includes('available') || query.includes('10 min')) {
+                results = [];
+                restaurants.slice(0, 4).forEach(restaurant => {
+                    results.push({ restaurant, item: restaurant.items[0] });
+                });
+            }
+
+            if (query.includes('sandwich') || query.includes('lunch') || query.includes('club')) {
+                results.push({ restaurant: restaurants[1], item: restaurants[1].items[0] });
+                results.push({ restaurant: restaurants[1], item: restaurants[1].items[1] });
+            }
+
+            if (query.includes('chinese') || query.includes('asian') || query.includes('lo mein') || query.includes('kung pao')) {
+                results.push({ restaurant: restaurants[2], item: restaurants[2].items[0] });
+                results.push({ restaurant: restaurants[2], item: restaurants[2].items[1] });
+            }
+
+            if (results.length === 0) {
+                restaurants.slice(0, 4).forEach(restaurant => {
+                    if (restaurant.items[0]) {
+                        results.push({ restaurant, item: restaurant.items[0] });
+                    }
+                });
+            }
+
+            return results.slice(0, 3);
+        }
+
+        function generateResponse(message) {
+            const results = findRelevantFood(message);
+            
+            if (results.length > 0) {
+                let response = `I found ${results.length} amazing deal${results.length > 1 ? 's' : ''} for you! 🎉`;
+                results.forEach(result => {
+                    response += createFoodCard(result.restaurant, result.item);
+                });
+                return response;
+            }
+            
+            return "I'm looking for available food near you! Try asking about pizza, sandwiches, or what's under $5. 🔍";
+        }
+
+        function sendMessage() {
+            const input = document.getElementById('userInput');
+            const message = input.value.trim();
+            
+            if (message === '') return;
+            
+            addMessage(message, false);
+            input.value = '';
+            
+            showTyping();
+            
+            setTimeout(() => {
+                removeTyping();
+                const response = generateResponse(message);
+                addMessage(response, true, true);
+            }, 1200);
+        }
+
+        function sendQuickMessage(message) {
+            document.getElementById('userInput').value = message;
+            sendMessage();
+        }
+
+        function handleKeyPress(event) {
+            if (event.key === 'Enter') {
+                sendMessage();
+            }
+        }
+    </script>
+</body>
+</html>
